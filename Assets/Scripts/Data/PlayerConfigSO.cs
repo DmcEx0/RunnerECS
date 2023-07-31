@@ -9,8 +9,10 @@ public class PlayerConfigSO : ScriptableObject
     [SerializeField] private GameObject _playerPrefab;
     [SerializeField] private int _defaultNumberOfCoin;
     [SerializeField] private float _offsetStepLength;
+    [SerializeField] private float _offsetSpeed;
 
     public float PlayerDefaultSpeed => _playerDefaultSpeed;
     public GameObject PlayerPrefab => _playerPrefab;
     public float OffsetStepLength => _offsetStepLength;
+    public float OffsetSpeed => _offsetSpeed;
 }
