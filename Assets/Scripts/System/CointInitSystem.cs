@@ -13,13 +13,12 @@ public class CointInitSystem : IEcsInitSystem
         var world = systems.GetWorld();
         var gameData = systems.GetShared<GameData>();
 
- 
+        var coinPool = world.GetPool<CoinComponent>();
 
         for (int i = 0; i < gameData.CoinsSpawnPointParentTransform.childCount; i++)
         {
             var coinEntity = world.NewEntity();
 
-            var coinPool = world.GetPool<CoinComponent>();
             coinPool.Add(coinEntity);
             ref var coinComponent = ref coinPool.Get(coinEntity);
 

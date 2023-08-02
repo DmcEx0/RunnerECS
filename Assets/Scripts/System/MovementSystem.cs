@@ -1,5 +1,4 @@
 using Leopotam.EcsLite;
-using System.Collections;
 using UnityEngine;
 
 public sealed class MovementSystem : IEcsRunSystem, IEcsInitSystem
@@ -21,6 +20,8 @@ public sealed class MovementSystem : IEcsRunSystem, IEcsInitSystem
         {
             ref var playerComponent = ref _playerPool.Get(entity);
             ref var movableComponent = ref _movablePool.Get(entity);
+
+            playerComponent.RB.position = Vector3.Lerp(playerComponent.RB.position, new Vector3(movableComponent.NextPositionX, playerComponent.RB.position.y, playerComponent.RB.position.z), 5f * Time.fixedDeltaTime);
 
             playerComponent.RB.MovePosition(playerComponent.RB.position + Vector3.forward * movableComponent.Speed * Time.fixedDeltaTime);
         }

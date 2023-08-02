@@ -10,12 +10,13 @@ public sealed class Startup : MonoBehaviour
     [SerializeField] private CinemachineVirtualCamera _virtualCamera;
     [SerializeField] private Transform _playerSpawnPointTransform;
     [SerializeField] private Transform _coinsSpawnPointParentTransform;
+    [SerializeField] private Transform _trackLanesParentTransfom;
     [SerializeField] private TMP_Text _coinCounter;
     [SerializeField] private int _maxNumberOfCoin = 99;
     [SerializeField] private GameObject _gameOverPanel;
     [SerializeField] private GameObject _winPanel;
-    [SerializeField] private float _leftBorderX;
-    [SerializeField] private float _rightBorderX;
+    [Range(0.1f, 1f)]
+    [SerializeField] private float _delayBetweenChangePosX;
 
     private EcsWorld _world;
     private IEcsSystems _initSystem;
@@ -34,10 +35,9 @@ public sealed class Startup : MonoBehaviour
         gameData.MaxNumberOfCoin = _maxNumberOfCoin;
         gameData.GameOverPanel = _gameOverPanel;
         gameData.WinPanel = _winPanel;
-        gameData.LeftBorderX = _leftBorderX;
-        gameData.RightBorderX = _rightBorderX;
+        gameData.TrackLanesParentTransfom = _trackLanesParentTransfom;
+        gameData.DelayBetweenChangePosX = _delayBetweenChangePosX;
         
-
         _world = new EcsWorld();
 
         _updateSystems = new EcsSystems(_world);
@@ -53,6 +53,8 @@ public sealed class Startup : MonoBehaviour
 
         _updateSystems = new EcsSystems(_world, gameData)
             .Add(new PlayerInputSystem())
+            .Add(new ChangePositionXBlockSystem())
+            .Add(new ChangePositionXSystem())
             .Add(new DieHitSystem())
             .Add(new WinHitSystem())
             .Add(new CoinHitSystem());
@@ -60,8 +62,7 @@ public sealed class Startup : MonoBehaviour
         _updateSystems.Init();
 
         _fixedUpdateSystems = new EcsSystems(_world, gameData)
-            .Add(new MovementSystem())
-            .Add(new ChangePositionXSystem());
+            .Add(new MovementSystem());
 
         _fixedUpdateSystems.Init();
     }

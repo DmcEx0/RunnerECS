@@ -22,10 +22,6 @@ public class PlayerInitSystem : IEcsInitSystem
         movablePool.Add(playerEntity);
         ref var movableComponent = ref movablePool.Get(playerEntity);
 
-        var offsetPool = world.GetPool<OffsetComponent>();
-        offsetPool.Add(playerEntity);
-        ref var offsetComponent = ref offsetPool.Get(playerEntity);
-
         var spawnedPlayerPrefab = GameObject.Instantiate(gameData.PlayerData.PlayerPrefab, gameData.PlayerSpawnPointTransform.position, Quaternion.identity);
 
         spawnedPlayerPrefab.GetComponent<TriggerChecker>().World = world;
@@ -33,9 +29,9 @@ public class PlayerInitSystem : IEcsInitSystem
         playerComponent.RB = spawnedPlayerPrefab.GetComponent<Rigidbody>();
         playerComponent.Collider = spawnedPlayerPrefab.GetComponent<CapsuleCollider>();
         playerComponent.Transform = spawnedPlayerPrefab.transform;
-        playerComponent.OffsetStepLength = gameData.PlayerData.OffsetStepLength;
-        
-        offsetComponent.OffsetSpeed = gameData.PlayerData.OffsetSpeed;
+
+        movableComponent.ChangePositionXSpeed = gameData.PlayerData.ChangePositionXSpeed;
         movableComponent.Speed = gameData.PlayerData.PlayerDefaultSpeed;
+        movableComponent.NextPositionX = gameData.PlayerSpawnPointTransform.position.x;
     }
 }

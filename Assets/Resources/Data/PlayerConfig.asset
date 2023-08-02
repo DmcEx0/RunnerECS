@@ -15,4 +15,4 @@ MonoBehaviour:
   _playerDefaultSpeed: 7.14
   _playerPrefab: {fileID: 561319284398563312, guid: 8d6360fc5ae35c04685ac2280c79a235, type: 3}
   _defaultNumberOfCoin: 0
-  _offsetStepLength: 3.5
+  _changePositionXSpeed: 5

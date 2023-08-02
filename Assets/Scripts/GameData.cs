@@ -9,10 +9,10 @@ public class GameData
     public CinemachineVirtualCamera VirtualCamera;
     public Transform PlayerSpawnPointTransform;
     public Transform CoinsSpawnPointParentTransform;
+    public Transform TrackLanesParentTransfom;
     public TMP_Text CoinCounter;
     public GameObject GameOverPanel;
     public GameObject WinPanel;
     public int MaxNumberOfCoin;
-    public float LeftBorderX;
-    public float RightBorderX;
+    public float DelayBetweenChangePosX;
 }

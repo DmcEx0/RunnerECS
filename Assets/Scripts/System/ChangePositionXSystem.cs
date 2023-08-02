@@ -1,38 +1,69 @@
 using Leopotam.EcsLite;
+using System.Collections.Generic;
 using UnityEngine;
 
 public class ChangePositionXSystem : IEcsInitSystem, IEcsRunSystem
 {
     private GameData _gameData;
     private EcsFilter _filter;
-    private EcsPool<PlayerComponent> _playerPool;
+
     private EcsPool<PlayerInputComponent> _playerInputPool;
-    private EcsPool<OffsetComponent> _offsetPool;
+    private EcsPool<ChangePositionXBlockComponent> _changePositionXBlockPool;
+    private EcsPool<MovableComponent> _movablePool;
+
+    private List<Transform> _lanesPosints;
+    private int _currentLane = 1;
+    private int _nextLane = 1;
 
     public void Init(IEcsSystems systems)
     {
         _gameData = systems.GetShared<GameData>();
-        _filter = systems.GetWorld().Filter<PlayerComponent>().Inc<PlayerInputComponent>().Inc<OffsetComponent>().End();
+        _filter = systems.GetWorld().Filter<PlayerInputComponent>().Inc<MovableComponent>().Exc<ChangePositionXBlockComponent>().End();
 
-        _playerPool = systems.GetWorld().GetPool<PlayerComponent>();
         _playerInputPool = systems.GetWorld().GetPool<PlayerInputComponent>();
-        _offsetPool = systems.GetWorld().GetPool<OffsetComponent>();
+        _changePositionXBlockPool = systems.GetWorld().GetPool<ChangePositionXBlockComponent>();
+        _movablePool = systems.GetWorld().GetPool<MovableComponent>();
+
+        _lanesPosints = new List<Transform>();
+
+        for (int i = 0; i < _gameData.TrackLanesParentTransfom.childCount; i++)
+            _lanesPosints.Add(_gameData.TrackLanesParentTransfom.GetChild(i));
     }
 
     public void Run(IEcsSystems systems)
     {
         foreach (var entity in _filter)
         {
-            ref var playerComponent = ref _playerPool.Get(entity);
             ref var playerInputComponent = ref _playerInputPool.Get(entity);
-            ref var offsetComponent = ref _offsetPool.Get(entity);
+            ref var movableComponent = ref _movablePool.Get(entity);
 
-            Vector3 nextPosition = new Vector3(playerInputComponent.Direction.x * playerComponent.OffsetStepLength, 0f, 0f);
+            ref var changePositionXBlockComponent = ref _changePositionXBlockPool.Add(entity);
 
-            if (playerComponent.RB.position.x + playerInputComponent.Direction.x > _gameData.LeftBorderX && playerComponent.RB.position.x + playerInputComponent.Direction.x < _gameData.RightBorderX)
+            if (playerInputComponent.Direction.x < 0)
             {
-                playerComponent.RB.position = Vector3.Lerp(playerComponent.RB.position, playerComponent.RB.position + nextPosition, offsetComponent.OffsetSpeed * Time.fixedDeltaTime);
+                if (_currentLane - 1 >= 0)
+                {
+                    SetNextPositionX(ref movableComponent, ref changePositionXBlockComponent, _currentLane - 1);
+                }
+            }
+
+            if (playerInputComponent.Direction.x >= 1)
+            {
+                if (_currentLane + 1 <= _lanesPosints.Count - 1)
+                {
+                    SetNextPositionX(ref movableComponent, ref changePositionXBlockComponent, _currentLane + 1);
+                }
             }
         }
+    }
+
+    private void SetNextPositionX(ref MovableComponent movableComponent, ref ChangePositionXBlockComponent changePositionXBlockComponent, int nextLane)
+    {
+        _nextLane = nextLane;
+        _currentLane = _nextLane;
+
+        movableComponent.NextPositionX = _lanesPosints[_nextLane].position.x;
+
+        changePositionXBlockComponent.Timer = _gameData.DelayBetweenChangePosX;
     }
 }
